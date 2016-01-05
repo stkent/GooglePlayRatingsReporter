@@ -8,12 +8,12 @@ import hipchat
 global latest_saved_version, latest_saved_ratings, latest_saved_average
 
 
-def __post_message_if_version_updated():
+def _post_message_if_version_updated():
     if new_version != latest_saved_version:
         hipchat.post_message_for_new_app_version(ROOM_NAME, PROJECT_NAME, new_version)
 
 
-def __post_messages_if_ratings_changed():
+def _post_messages_if_ratings_changed():
     rating_count_changes = [new_ratings[j] - latest_saved_ratings[j] for j in range(5)]
 
     for k in range(5):
@@ -40,7 +40,7 @@ def __post_messages_if_ratings_changed():
                 )
 
 
-def __try_loading_config_from_disk():
+def _try_loading_config_from_disk():
     try:
         c = json.load(open("configuration.json", "r"))
     except (IOError, ValueError):
@@ -49,7 +49,7 @@ def __try_loading_config_from_disk():
 
 
 if __name__ == "__main__":
-    config = __try_loading_config_from_disk()
+    config = _try_loading_config_from_disk()
 
     project_names = config.keys()
 
@@ -89,8 +89,8 @@ if __name__ == "__main__":
         # print latest_saved_ratings
         # print latest_saved_average
 
-        __post_message_if_version_updated()
-        __post_messages_if_ratings_changed()
+        _post_message_if_version_updated()
+        _post_messages_if_ratings_changed()
 
         # save updated app data
         diskops.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
