@@ -72,7 +72,6 @@ if __name__ == "__main__":
 
         # extract saved data for comparisons
         try:
-            # TODO: compare X.X.X version numbers more intelligently
             latest_saved_version = max(latest_saved_data.keys())
             latest_saved_version_data = latest_saved_data[latest_saved_version]
             latest_saved_date = max(latest_saved_version_data.keys())
