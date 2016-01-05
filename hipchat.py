@@ -7,35 +7,35 @@ BASE_HIPCHAT_URL = "https://api.hipchat.com/v1/rooms/message"
 def post_message_for_rating_lost(project_name, room_name, star_rating, num_lost, increased_average):
     message_emoji = _get_emoji_for_rating_change(increased_average)
     _post_message(
-        room_name,
+            room_name,
             _get_message_for_rating_lost(project_name, star_rating, num_lost) + message_emoji,
-        _get_color_for_rating_change(increased_average)
+            _get_color_for_rating_change(increased_average)
     )
 
 
 def post_message_for_rating_gained(project_name, room_name, star_rating, num_lost, increased_average):
     message_emoji = _get_emoji_for_rating_change(increased_average)
     _post_message(
-        room_name,
+            room_name,
             _get_message_for_rating_gained(project_name, star_rating, num_lost) + message_emoji,
-        _get_color_for_rating_change(increased_average)
+            _get_color_for_rating_change(increased_average)
     )
 
 
 def post_message_for_new_app_version(room_name, project_name, new_app_version):
     _post_message(
-        room_name,
-        project_name + " app v" + new_app_version + " released!" + " (yey)",
-        "green"
+            room_name,
+            project_name + " app v" + new_app_version + " released!" + " (yey)",
+            "green"
     )
 
 
 def _post_message(room_name, message_text, message_color):
-    hipchat_url = BASE_HIPCHAT_URL\
-        + "?auth_token=" + HIPCHAT_TOKEN\
-        + "&room_id=" + room_name\
-        + "&from=Google+Play"\
-        + "&message_format=text"
+    hipchat_url = BASE_HIPCHAT_URL \
+                  + "?auth_token=" + HIPCHAT_TOKEN \
+                  + "&room_id=" + room_name \
+                  + "&from=Google+Play" \
+                  + "&message_format=text"
 
     headers = {"content-type": "application/x-www-form-urlencoded"}
     payload = {"message": message_text, "color": message_color}
