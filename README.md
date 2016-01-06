@@ -23,21 +23,22 @@ Create a new file called "configuration.json" in the root directory of the repos
             "name": "App 1 Name ",
             "scrape_url": "https://play.google.com/store/apps/details?id=com.example.app1&hl=en",
             "channels": {
-                "hipchat": "hipchat-room-name-for-app-1"
+                "hipchat": "hipchat-channel-name-for-app-1"
             }
         },
         {
             "name": "App 2 Name",
             "scrape_url": "https://play.google.com/store/apps/details?id=com.example.app2&hl=en",
             "channels": {
-                "hipchat": "hipchat-room-name-for-app-2",
-                "slack": "slack-room-name-for-app-2"
+                "hipchat": "hipchat-channel-name-for-app-2",
+                "slack": "slack-channel-name-for-app-2"
             }
         }
     ]
 }
-
 ```
+
+Note that configuration Slack channel names must not include a leading #.
 
 # License
 
