@@ -3,7 +3,6 @@
 data_processing/
 *_app_data.txt
 configuration.json
-tokens.py
 
 # Created by https://www.gitignore.io/api/osx,python,pycharm
 

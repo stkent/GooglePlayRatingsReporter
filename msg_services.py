@@ -2,7 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from enum import Enum
 from requests import post
-from tokens import HIPCHAT_TOKEN, SLACK_TOKEN
+from os import environ
 
 
 class MessageType(Enum):
@@ -45,8 +45,10 @@ class HipChat(BaseMessagingService):
 
     @staticmethod
     def _post_message(room_name, full_message, message_color):
+        auth_token = environ["HIPCHAT_AUTH_TOKEN"]
+
         url_parameters = {
-            "auth_token": HIPCHAT_TOKEN,
+            "auth_token": auth_token,
             "room_id": room_name,
             "from": "Google Play",
             "message_format": "text"
@@ -79,10 +81,12 @@ class Slack(BaseMessagingService):
 
     @staticmethod
     def _post_message(room_name, full_message):
+        auth_token = environ["SLACK_AUTH_TOKEN"]
+
         prefixed_room_name = "#" + room_name
 
         url_parameters = {
-            "token": SLACK_TOKEN,
+            "token": auth_token,
             "channel": prefixed_room_name,
             "username": "Google Play",
             "text": full_message

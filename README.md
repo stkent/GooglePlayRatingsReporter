@@ -2,14 +2,14 @@
 A short python script that scrapes Google Play Store pages for app review counts.
 
 # Setup
-Create a new file called "tokens.py" in the root directory of the repository. Add lines of the form
+(Local) Add the following lines to your `.bash_profile`:
 
-```python
-HIPCHAT_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-SLACK_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+```shell
+export HIPCHAT_AUTH_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+export SLACK_AUTH_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-where "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" is a valid token for the corresponding API. (You can safely omit either of these lines if you intend to use a single messaging service.)
+where "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" represents a valid token for the corresponding API. (You can safely omit either of these lines if you intend to use a single messaging service.)
 
 Create a new file called "configuration.json" in the root directory of the repository. Add a json object of the form
 
