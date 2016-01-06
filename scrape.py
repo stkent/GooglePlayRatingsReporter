@@ -28,7 +28,7 @@ def _post_messages_if_ratings_changed(msg_service, room_name):
             stars = 5 - k
 
             if rating_count_change < 0:
-                base_message = msg_providers.get_message_for_rating_lost(PROJECT_NAME, stars, rating_count_change)
+                base_message = msg_providers.get_message_for_rating_lost(PROJECT_NAME, stars, abs(rating_count_change))
 
                 msg_service.post_message(
                     room_name=room_name,
