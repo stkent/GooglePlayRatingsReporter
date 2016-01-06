@@ -45,11 +45,12 @@ class HipChat(BaseMessagingService):
 
     @staticmethod
     def _post_message(room_name, full_message, message_color):
-        hipchat_url = HipChat.BASE_URL \
-                      + "?auth_token=" + HIPCHAT_TOKEN \
-                      + "&room_id=" + room_name \
-                      + "&from=Google+Play" \
-                      + "&message_format=text"
+        url_parameters = {
+            "auth_token": HIPCHAT_TOKEN,
+            "room_id": room_name,
+            "from": "Google Play",
+            "message_format": "text"
+        }
 
         headers = {"content-type": "application/x-www-form-urlencoded"}
         payload = {"message": full_message}
@@ -57,7 +58,7 @@ class HipChat(BaseMessagingService):
         if message_color:
             payload["color"] = message_color
 
-        post(hipchat_url, data=payload, headers=headers)
+        post(HipChat.BASE_URL, headers=headers, params=url_parameters, data=payload)
 
 
 class Slack(BaseMessagingService):
