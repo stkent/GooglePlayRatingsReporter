@@ -2,7 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from enum import Enum
 from requests import post
-from tokens import HIPCHAT_TOKEN
+from tokens import HIPCHAT_TOKEN, SLACK_TOKEN
 
 
 class MessageType(Enum):
@@ -58,3 +58,33 @@ class HipChat(BaseMessagingService):
             payload["color"] = message_color
 
         post(hipchat_url, data=payload, headers=headers)
+
+
+class Slack(BaseMessagingService):
+    BASE_URL = "https://slack.com/api/chat.postMessage"
+
+    def post_message(self, room_name, base_message, message_type=None):
+        message_emoji_string = self._get_message_emoji_string(message_type)
+        full_message = base_message + message_emoji_string
+
+        Slack._post_message(room_name, full_message)
+
+    @staticmethod
+    def _get_message_emoji_string(message_type):
+        return {
+            MessageType.Good: " :yey:",
+            MessageType.Bad: " :sadpanda:"
+        }[message_type]
+
+    @staticmethod
+    def _post_message(room_name, full_message):
+        prefixed_room_name = "#" + room_name
+
+        url_parameters = {
+            "token": SLACK_TOKEN,
+            "channel": prefixed_room_name,
+            "username": "Google Play",
+            "text": full_message
+        }
+
+        post(Slack.BASE_URL, params=url_parameters)
