@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import diskops
 from msg_services import MessageType
-from msg_services import HipChat
+from msg_services import HipChat, Slack
 import msg_providers
 
 global latest_saved_version, latest_saved_ratings, latest_saved_average
@@ -67,7 +67,8 @@ if __name__ == "__main__":
     enabled_service_names = config["services"]
 
     service_lookup_dict = {
-        "hipchat": HipChat()
+        "hipchat": HipChat(),
+        "slack": Slack()
     }
 
     for app in config["apps"]:
