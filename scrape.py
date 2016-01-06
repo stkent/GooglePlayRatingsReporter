@@ -3,17 +3,17 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import diskops
-import hipchat
+import msg_services
 
 global latest_saved_version, latest_saved_ratings, latest_saved_average
 
 
-def _post_message_if_version_updated(room_name):
+def _post_message_if_version_updated(msg_service, room_name):
     if new_version != latest_saved_version:
-        hipchat.post_message_for_new_app_version(room_name, PROJECT_NAME, new_version)
+        msg_service.post_message_for_new_app_version(room_name, PROJECT_NAME, new_version)
 
 
-def _post_messages_if_ratings_changed(room_name):
+def _post_messages_if_ratings_changed(msg_service, room_name):
     rating_count_changes = [new_ratings[j] - latest_saved_ratings[j] for j in range(5)]
 
     for k in range(5):
@@ -23,7 +23,7 @@ def _post_messages_if_ratings_changed(room_name):
             stars = 5 - k
 
             if rating_count_change < 0:
-                hipchat.post_message_for_rating_lost(
+                msg_service.post_message_for_rating_lost(
                     PROJECT_NAME,
                     room_name,
                     stars,
@@ -31,7 +31,7 @@ def _post_messages_if_ratings_changed(room_name):
                     stars < latest_saved_average
                 )
             else:
-                hipchat.post_message_for_rating_gained(
+                msg_service.post_message_for_rating_gained(
                     PROJECT_NAME,
                     room_name,
                     stars,
@@ -61,7 +61,11 @@ if __name__ == "__main__":
     if "apps" not in config:
         raise LookupError("Configuration file is malformed.")
 
-    enabled_services = config["services"]
+    enabled_service_names = config["services"]
+
+    service_lookup_dict = {
+        "hipchat": msg_services.HipChat()
+    }
 
     for app in config["apps"]:
         # load per-project configuration
@@ -98,12 +102,13 @@ if __name__ == "__main__":
         # print latest_saved_ratings
         # print latest_saved_average
 
-        # TODO: make this work for more than 1 service
-        if "hipchat" in enabled_services and "hipchat" in CHANNELS:
-            hipchat_room_name = CHANNELS["hipchat"]
+        for service_name in CHANNELS:
+            if service_name in enabled_service_names and service_name in service_lookup_dict:
+                service = service_lookup_dict[service_name]
+                channel = CHANNELS[service_name]
 
-            _post_message_if_version_updated(hipchat_room_name)
-            _post_messages_if_ratings_changed(hipchat_room_name)
+                _post_message_if_version_updated(service, channel)
+                _post_messages_if_ratings_changed(service, channel)
 
         # save updated app data
         diskops.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
