@@ -2,13 +2,14 @@
 A short python script that scrapes Google Play Store pages for app rating counts and reports changes to HipChat/Slack.
 
 # Setup
-Create a new file called "tokens.py" in the root directory of the repository. Add a line of the form
+Create a new file called "tokens.py" in the root directory of the repository. Add lines of the form
 
 ```python
 HIPCHAT_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+SLACK_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-where "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" is a valid token for v1 of the HipChat API.
+where "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" is a valid token for the corresponding API. (You can safely omit either of these lines if you intend to use a single messaging service.)
 
 Create a new file called "configuration.json" in the root directory of the repository. Add a json object of the form
 
