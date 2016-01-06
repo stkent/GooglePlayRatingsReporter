@@ -8,12 +8,12 @@ import hipchat
 global latest_saved_version, latest_saved_ratings, latest_saved_average
 
 
-def _post_message_if_version_updated():
+def _post_message_if_version_updated(room_name):
     if new_version != latest_saved_version:
-        hipchat.post_message_for_new_app_version(ROOM_NAME, PROJECT_NAME, new_version)
+        hipchat.post_message_for_new_app_version(room_name, PROJECT_NAME, new_version)
 
 
-def _post_messages_if_ratings_changed():
+def _post_messages_if_ratings_changed(room_name):
     rating_count_changes = [new_ratings[j] - latest_saved_ratings[j] for j in range(5)]
 
     for k in range(5):
@@ -25,7 +25,7 @@ def _post_messages_if_ratings_changed():
             if rating_count_change < 0:
                 hipchat.post_message_for_rating_lost(
                     PROJECT_NAME,
-                    ROOM_NAME,
+                    room_name,
                     stars,
                     abs(rating_count_change),
                     stars < latest_saved_average
@@ -33,7 +33,7 @@ def _post_messages_if_ratings_changed():
             else:
                 hipchat.post_message_for_rating_gained(
                     PROJECT_NAME,
-                    ROOM_NAME,
+                    room_name,
                     stars,
                     abs(rating_count_change),
                     stars > latest_saved_average
@@ -51,13 +51,23 @@ def _try_loading_config_from_disk():
 if __name__ == "__main__":
     config = _try_loading_config_from_disk()
 
-    project_names = config.keys()
+    # TODO: refactor/relocate these checks
+    if not isinstance(config, dict):
+        raise LookupError("Configuration file is malformed.")
 
-    for PROJECT_NAME in project_names:
+    if "services" not in config:
+        raise LookupError("Configuration file is malformed.")
+
+    if "apps" not in config:
+        raise LookupError("Configuration file is malformed.")
+
+    enabled_services = config["services"]
+
+    for app in config["apps"]:
         # load per-project configuration
-        project_config = config[PROJECT_NAME]
-        ROOM_NAME = project_config.get("room_name")
-        SCRAPE_URL = project_config.get("scrape_url")
+        PROJECT_NAME = app["name"]
+        SCRAPE_URL = app["scrape_url"]
+        CHANNELS = app["channels"]
 
         # get updated app data from the play store:
         r = requests.get(SCRAPE_URL)
@@ -88,8 +98,12 @@ if __name__ == "__main__":
         # print latest_saved_ratings
         # print latest_saved_average
 
-        _post_message_if_version_updated()
-        _post_messages_if_ratings_changed()
+        # TODO: make this work for more than 1 service
+        if "hipchat" in enabled_services and "hipchat" in CHANNELS:
+            hipchat_room_name = CHANNELS["hipchat"]
+
+            _post_message_if_version_updated(hipchat_room_name)
+            _post_messages_if_ratings_changed(hipchat_room_name)
 
         # save updated app data
         diskops.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
