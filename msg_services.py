@@ -1,8 +1,15 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from enum import Enum
 from requests import post
 from tokens import HIPCHAT_TOKEN
 import msg_providers
+
+
+class MessageType(Enum):
+    Good = 1
+    Neutral = 0
+    Bad = -1
 
 
 class BaseMessagingService(object):
