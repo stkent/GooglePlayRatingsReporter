@@ -10,7 +10,7 @@ global latest_saved_version, latest_saved_ratings, latest_saved_average
 
 def _post_message_if_version_updated(msg_service, room_name):
     if new_version != latest_saved_version:
-        msg_service.post_message_for_new_app_version(room_name, PROJECT_NAME, new_version)
+        msg_service.post_message_for_new_app_version(PROJECT_NAME, room_name, new_version)
 
 
 def _post_messages_if_ratings_changed(msg_service, room_name):
