@@ -16,7 +16,7 @@ class BaseMessagingService(object):
         pass
 
     @abstractmethod
-    def post_message_for_new_app_version(self, room_name, project_name, new_app_version):
+    def post_message_for_new_app_version(self, project_name, room_name, new_app_version):
         pass
 
 
@@ -39,7 +39,7 @@ class HipChat(BaseMessagingService):
                 HipChat._get_color_for_rating_change(increased_average)
         )
 
-    def post_message_for_new_app_version(self, room_name, project_name, new_app_version):
+    def post_message_for_new_app_version(self, project_name, room_name, new_app_version):
         HipChat._post_message(
                 room_name,
                 project_name + " app v" + new_app_version + " released!" + " (yey)",
