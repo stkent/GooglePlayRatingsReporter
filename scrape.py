@@ -3,14 +3,19 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import diskops
-import msg_services
+from msg_services import MessageType
+from msg_services import HipChat
+import msg_providers
 
 global latest_saved_version, latest_saved_ratings, latest_saved_average
 
 
 def _post_message_if_version_updated(msg_service, room_name):
     if new_version != latest_saved_version:
-        msg_service.post_message_for_new_app_version(PROJECT_NAME, room_name, new_version)
+        msg_service.post_message(
+            room_name=room_name,
+            base_message=PROJECT_NAME + " app v" + new_version + " released!",
+            message_type=MessageType.Good)
 
 
 def _post_messages_if_ratings_changed(msg_service, room_name):
@@ -23,21 +28,19 @@ def _post_messages_if_ratings_changed(msg_service, room_name):
             stars = 5 - k
 
             if rating_count_change < 0:
-                msg_service.post_message_for_rating_lost(
-                    PROJECT_NAME,
-                    room_name,
-                    stars,
-                    abs(rating_count_change),
-                    stars < latest_saved_average
-                )
+                base_message = msg_providers.get_message_for_rating_lost(PROJECT_NAME, stars, rating_count_change)
+
+                msg_service.post_message(
+                    room_name=room_name,
+                    base_message=base_message,
+                    message_type=MessageType.Good if stars < latest_saved_average else MessageType.Bad)
             else:
-                msg_service.post_message_for_rating_gained(
-                    PROJECT_NAME,
-                    room_name,
-                    stars,
-                    abs(rating_count_change),
-                    stars > latest_saved_average
-                )
+                base_message = msg_providers.get_message_for_rating_gained(PROJECT_NAME, stars, rating_count_change)
+
+                msg_service.post_message(
+                    room_name=room_name,
+                    base_message=base_message,
+                    message_type=MessageType.Good if stars >= latest_saved_average else MessageType.Bad)
 
 
 def _try_loading_config_from_disk():
@@ -64,7 +67,7 @@ if __name__ == "__main__":
     enabled_service_names = config["services"]
 
     service_lookup_dict = {
-        "hipchat": msg_services.HipChat()
+        "hipchat": HipChat()
     }
 
     for app in config["apps"]:
@@ -97,10 +100,6 @@ if __name__ == "__main__":
             latest_saved_version = ""
             latest_saved_ratings = [0 for x in range(5)]
             latest_saved_average = 3
-
-        # print latest_saved_version
-        # print latest_saved_ratings
-        # print latest_saved_average
 
         for service_name in CHANNELS:
             if service_name in enabled_service_names and service_name in service_lookup_dict:
