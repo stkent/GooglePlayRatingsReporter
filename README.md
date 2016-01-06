@@ -1,5 +1,5 @@
-# GooglePlayReviewScraper
-A short python script that scrapes Google Play Store pages for app review counts.
+# GooglePlayRatingsReporter
+A short python script that scrapes Google Play Store pages for app rating counts and reports changes to HipChat/Slack.
 
 # Setup
 Create a new file called "tokens.py" in the root directory of the repository. Add a line of the form
