@@ -2,6 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from requests import post
 from tokens import HIPCHAT_TOKEN
+import msg_providers
 
 
 class BaseMessagingService(object):
@@ -27,7 +28,7 @@ class HipChat(BaseMessagingService):
         message_emoji = HipChat._get_emoji_for_rating_change(increased_average)
         self._post_message(
                 room_name,
-                HipChat._get_message_for_rating_lost(project_name, star_rating, num_lost) + message_emoji,
+                msg_providers.get_message_for_rating_lost(project_name, star_rating, num_lost) + message_emoji,
                 HipChat._get_color_for_rating_change(increased_average)
         )
 
@@ -35,7 +36,7 @@ class HipChat(BaseMessagingService):
         message_emoji = HipChat._get_emoji_for_rating_change(increased_average)
         self._post_message(
                 room_name,
-                HipChat._get_message_for_rating_gained(project_name, star_rating, num_lost) + message_emoji,
+                msg_providers.get_message_for_rating_gained(project_name, star_rating, num_lost) + message_emoji,
                 HipChat._get_color_for_rating_change(increased_average)
         )
 
@@ -57,26 +58,6 @@ class HipChat(BaseMessagingService):
         headers = {"content-type": "application/x-www-form-urlencoded"}
         payload = {"message": message_text, "color": message_color}
         post(hipchat_url, data=payload, headers=headers)
-
-    # TODO: move message forming to a different level of abstraction?
-
-    @staticmethod
-    def _get_message_for_rating_lost(project_name, star_rating, num_lost):
-        message_suffix = HipChat._get_message_suffix(num_lost)
-        message_text = project_name + " app lost " + str(num_lost) + " existing " + str(star_rating) + message_suffix
-
-        return message_text
-
-    @staticmethod
-    def _get_message_for_rating_gained(project_name, star_rating, num_gained):
-        message_suffix = HipChat._get_message_suffix(num_gained)
-        message_text = project_name + " app received " + str(num_gained) + " new " + str(star_rating) + message_suffix
-
-        return message_text
-
-    @staticmethod
-    def _get_message_suffix(num_lost):
-        return " star reviews." if num_lost > 1 else " star review."
 
     @staticmethod
     def _get_color_for_rating_change(increased_average):
