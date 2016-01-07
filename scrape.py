@@ -2,7 +2,7 @@ from __future__ import division
 import json
 import requests
 from bs4 import BeautifulSoup
-import diskops
+import storage
 from msg_services import MessageType
 from msg_services import HipChat, Slack
 import msg_providers
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         new_ratings = [int(rating.string.replace(",", "")) for rating in soup.find_all("span", "bar-number")]
 
         # load stored app data
-        latest_saved_data = diskops.read_data_from_file(PROJECT_NAME)
+        latest_saved_data = storage.read_data_from_file(PROJECT_NAME)
 
         # extract saved data for comparisons
         try:
@@ -111,4 +111,4 @@ if __name__ == "__main__":
                 _post_messages_if_ratings_changed(service, channel)
 
         # save updated app data
-        diskops.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
+        # storage.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
