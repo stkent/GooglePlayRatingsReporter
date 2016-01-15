@@ -63,7 +63,7 @@ if __name__ == "__main__":
         r = requests.get(SCRAPE_URL)
 
         # extract rating counts and app version number:
-        soup = BeautifulSoup(r.text)
+        soup = BeautifulSoup(r.text, "html.parser")
         new_version = soup.find("div", {"itemprop": "softwareVersion"}).next.strip()
         new_ratings = [int(rating.string.replace(",", "")) for rating in soup.find_all("span", "bar-number")]
 
