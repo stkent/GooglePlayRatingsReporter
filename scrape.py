@@ -3,17 +3,17 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import diskops
-import hipchat
+import msg_services
 
 global latest_saved_version, latest_saved_ratings, latest_saved_average
 
 
-def _post_message_if_version_updated():
+def _post_message_if_version_updated(msg_service, room_name):
     if new_version != latest_saved_version:
-        hipchat.post_message_for_new_app_version(ROOM_NAME, PROJECT_NAME, new_version)
+        msg_service.post_message_for_new_app_version(room_name, PROJECT_NAME, new_version)
 
 
-def _post_messages_if_ratings_changed():
+def _post_messages_if_ratings_changed(msg_service, room_name):
     rating_count_changes = [new_ratings[j] - latest_saved_ratings[j] for j in range(5)]
 
     for k in range(5):
@@ -23,17 +23,17 @@ def _post_messages_if_ratings_changed():
             stars = 5 - k
 
             if rating_count_change < 0:
-                hipchat.post_message_for_rating_lost(
+                msg_service.post_message_for_rating_lost(
                     PROJECT_NAME,
-                    ROOM_NAME,
+                    room_name,
                     stars,
                     abs(rating_count_change),
                     stars < latest_saved_average
                 )
             else:
-                hipchat.post_message_for_rating_gained(
+                msg_service.post_message_for_rating_gained(
                     PROJECT_NAME,
-                    ROOM_NAME,
+                    room_name,
                     stars,
                     abs(rating_count_change),
                     stars > latest_saved_average
@@ -51,13 +51,27 @@ def _try_loading_config_from_disk():
 if __name__ == "__main__":
     config = _try_loading_config_from_disk()
 
-    project_names = config.keys()
+    # TODO: refactor/relocate these checks
+    if not isinstance(config, dict):
+        raise LookupError("Configuration file is malformed.")
 
-    for PROJECT_NAME in project_names:
+    if "services" not in config:
+        raise LookupError("Configuration file is malformed.")
+
+    if "apps" not in config:
+        raise LookupError("Configuration file is malformed.")
+
+    enabled_service_names = config["services"]
+
+    service_lookup_dict = {
+        "hipchat": msg_services.HipChat()
+    }
+
+    for app in config["apps"]:
         # load per-project configuration
-        project_config = config[PROJECT_NAME]
-        ROOM_NAME = project_config.get("room_name")
-        SCRAPE_URL = project_config.get("scrape_url")
+        PROJECT_NAME = app["name"]
+        SCRAPE_URL = app["scrape_url"]
+        CHANNELS = app["channels"]
 
         # get updated app data from the play store:
         r = requests.get(SCRAPE_URL)
@@ -88,8 +102,13 @@ if __name__ == "__main__":
         # print latest_saved_ratings
         # print latest_saved_average
 
-        _post_message_if_version_updated()
-        _post_messages_if_ratings_changed()
+        for service_name in CHANNELS:
+            if service_name in enabled_service_names and service_name in service_lookup_dict:
+                service = service_lookup_dict[service_name]
+                channel = CHANNELS[service_name]
+
+                _post_message_if_version_updated(service, channel)
+                _post_messages_if_ratings_changed(service, channel)
 
         # save updated app data
         diskops.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
