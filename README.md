@@ -1,7 +1,9 @@
-# GooglePlayReviewScraper
-A short python script that scrapes Google Play Store pages for app review counts.
+# GooglePlayRatingsReporter
+
+A short python script that scrapes Google Play Store pages for app rating counts and reports changes to HipChat/Slack.
 
 # Setup
+
 (Local) Add the following lines to your `.bash_profile`:
 
 ```shell
