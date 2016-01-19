@@ -2,7 +2,7 @@ from __future__ import division
 import json
 import requests
 from bs4 import BeautifulSoup
-import diskops
+from diskops import DataSaver
 from msg_services import MessageType
 from msg_services import HipChat, Slack
 import msg_providers
@@ -53,6 +53,7 @@ def _try_loading_config_from_disk():
 
 if __name__ == "__main__":
     config = _try_loading_config_from_disk()
+    data_saver = DataSaver()
 
     # TODO: refactor/relocate these checks
     if not isinstance(config, dict):
@@ -86,7 +87,7 @@ if __name__ == "__main__":
         new_ratings = [int(rating.string.replace(",", "")) for rating in soup.find_all("span", "bar-number")]
 
         # load stored app data
-        latest_saved_data = diskops.read_data_from_file(PROJECT_NAME)
+        latest_saved_data = data_saver.read_data_from_file(PROJECT_NAME)
 
         # extract saved data for comparisons
         try:
@@ -111,4 +112,4 @@ if __name__ == "__main__":
                 _post_messages_if_ratings_changed(service, channel)
 
         # save updated app data
-        diskops.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
+        data_saver.write_data_to_file(PROJECT_NAME, latest_saved_data, new_version, new_ratings)
